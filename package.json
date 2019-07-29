@@ -1,9 +1,0 @@
-{
-  "name": "app",
-  "version": "1.0.0",
-  "dependencies": {
-    "cheerio": "^1.0.0-rc.3",
-    "needle": "^2.4.0",
-    "worker-threads-pool": "^2.0.0"
-  }
-}
