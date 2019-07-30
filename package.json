@@ -7,6 +7,8 @@
     "express": "^4.17.1",
     "needle": "^2.4.0",
     "request": "^2.88.0",
-    "worker-threads-pool": "^2.0.0"
+    "worker-threads-pool": "^2.0.0",
+    "sequelize": "^5.10.3",
+    "sqlite3": "^4.0.9"
   }
 }
