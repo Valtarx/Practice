@@ -17,15 +17,17 @@ exapp.get("/translations",function(request,response){
         throw error0;
     }
     var indexOfThisResponse;
+    ++totalNumOfResponses;
+    indexOfThisResponse = totalNumOfResponses;
+    isRepsonseReadyFlags[indexOfThisResponse] = false;
     connection.createChannel(function(error1, channel) {
         if (error1) {
             throw error1;
         }
-        var indexOfThisResponse;
         var queue = 'translation_queue';
-        ++totalNumOfResponses;
-        indexOfThisResponse = totalNumOfResponses;
-        isRepsonseReadyFlags[indexOfThisResponse] = false;
+        
+        console.log("This is earlier0");
+        
         var msg = indexOfThisResponse.toString()+";https://wooordhunt.ru/word/;"+"green";
 
         channel.assertQueue(queue, {
@@ -41,6 +43,8 @@ exapp.get("/translations",function(request,response){
       // connection.close();
       // process.exit(0);
       // }, 500);
+      console.log("This is earlier1");
+      console.log("indexOfthis"+indexOfThisResponse);
       isResponseReadyTimers[indexOfThisResponse] = setInterval(isResponseReady,1000,response,indexOfThisResponse);
       response.send("Success!");
 });
@@ -94,6 +98,7 @@ function giveTask(){
 }
 
 function isResponseReady(response,indexOfThisResponse){
+  console.log("I was Here"+indexOfThisResponse);
   if(isRepsonseReadyFlags[indexOfThisResponse] == true){
     clearInterval(isResponseReadyTimers[indexOfThisResponse]);
     //здесь код ответа из бд
