@@ -5,6 +5,12 @@ var amqp = require('amqplib/callback_api');
 const exapp = express();
 
 var isResponseReadyTimer;
+var isResponseReadyTimers = [];
+var isRepsonseReadyFlags  = [];
+var totalNumOfResponses = -1;
+exapp.get("",function(request,response){
+  response.send(index.html);
+})
 exapp.get("/translations",function(request,response){
   amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
@@ -14,7 +20,11 @@ exapp.get("/translations",function(request,response){
         if (error1) {
             throw error1;
         }
+        var indexOfThisResponse;
         var queue = 'translation_queue';
+        ++totalNumOfResponses;
+        indexOfThisResponse = totalNumOfResponses;
+        isRepsonseReadyFlags[indexOfThisResponse] = false;
         var msg = "green";
 
         channel.assertQueue(queue, {
@@ -30,7 +40,7 @@ exapp.get("/translations",function(request,response){
       // connection.close();
       // process.exit(0);
       // }, 500);
-      isResponseReadyTimer = setInterval(isResponseReady,1000,response);
+      isResponseReadyTimers[indexOfThisResponse] = setInterval(isResponseReady,1000,response,indexOfThisResponse);
       response.send("Success!");
 });
 
@@ -60,7 +70,10 @@ function giveTask(){
         console.log(" [*] Waiting for messages in %s.", queue);
         channel.consume(queue, function(msg) {
         console.log(" [x] Received %s", msg.content.toString());
+
         workerData.word = msg.content.toString();
+        workerData.source = "https://wooordhunt.ru/word/";
+
         ////////////////
         pool.acquire('./word-tra-worker.js',{workerData} ,function (err, worker) {
           //pool.acquire('./ndl.js', function (err, worker) {
@@ -77,11 +90,11 @@ function giveTask(){
 });
 }
 
-function isResponseReady(response){
-  var gotov = "готов";
-  if(gotov){
-    clearInterval(isResponseReadyTimer);
+function isResponseReady(response,indexOfThisResponse){
+  if(isRepsonseReadyFlags[indexOfThisResponse] == true){
+    clearInterval(isResponseReadyTimers[indexOfThisResponse]);
     //здесь код ответа из бд
+    response.send
   }
 }
 
