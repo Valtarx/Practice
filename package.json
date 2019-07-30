@@ -1,6 +1,9 @@
 {
   "name": "app",
   "version": "1.0.0",
+  "scripts": {
+    "start": "node --experimental-worker main.js"
+  },
   "dependencies": {
     "amqplib": "^0.5.3",
     "cheerio": "^1.0.0-rc.3",
