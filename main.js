@@ -8,9 +8,7 @@ var isResponseReadyTimer;
 var isResponseReadyTimers = [];
 var isRepsonseReadyFlags  = [];
 var totalNumOfResponses = -1;
-exapp.get("",function(request,response){
-  response.send(index.html);
-})
+
 exapp.get("/translations",function(request,response){
   amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
@@ -25,9 +23,7 @@ exapp.get("/translations",function(request,response){
             throw error1;
         }
         var queue = 'translation_queue';
-        
-        console.log("This is earlier0");
-        
+                
         var msg = indexOfThisResponse.toString()+";https://wooordhunt.ru/word/;"+"green";
 
         channel.assertQueue(queue, {
@@ -43,7 +39,6 @@ exapp.get("/translations",function(request,response){
       // connection.close();
       // process.exit(0);
       // }, 500);
-      console.log("This is earlier1");
       console.log("indexOfthis"+indexOfThisResponse);
       isResponseReadyTimers[indexOfThisResponse] = setInterval(isResponseReady,1000,response,indexOfThisResponse);
       response.send("Success!");
