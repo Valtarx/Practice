@@ -16,6 +16,7 @@ exapp.get("/translations",function(request,response){
     if (error0) {
         throw error0;
     }
+    var indexOfThisResponse;
     connection.createChannel(function(error1, channel) {
         if (error1) {
             throw error1;
@@ -25,7 +26,7 @@ exapp.get("/translations",function(request,response){
         ++totalNumOfResponses;
         indexOfThisResponse = totalNumOfResponses;
         isRepsonseReadyFlags[indexOfThisResponse] = false;
-        var msg = "green";
+        var msg = indexOfThisResponse.toString()+";https://wooordhunt.ru/word/;"+"green";
 
         channel.assertQueue(queue, {
             durable: true
@@ -70,9 +71,9 @@ function giveTask(){
         console.log(" [*] Waiting for messages in %s.", queue);
         channel.consume(queue, function(msg) {
         console.log(" [x] Received %s", msg.content.toString());
-
-        workerData.word = msg.content.toString();
-        workerData.source = "https://wooordhunt.ru/word/";
+        var data = msg.content.toString().split(';');
+        workerData.word = data[2];
+        workerData.source = data[1];
 
         ////////////////
         pool.acquire('./word-tra-worker.js',{workerData} ,function (err, worker) {
@@ -82,6 +83,8 @@ function giveTask(){
           worker.on('exit', function () {
             channel.ack(msg);
               {noAck: false }
+              indexOfReadyResponse = parseInt(data[0]);
+              isRepsonseReadyFlags[0] = true;
             console.log(`worker ${i} exited (pool size: ${pool.size})`)
             })
           })
@@ -94,6 +97,7 @@ function isResponseReady(response,indexOfThisResponse){
   if(isRepsonseReadyFlags[indexOfThisResponse] == true){
     clearInterval(isResponseReadyTimers[indexOfThisResponse]);
     //здесь код ответа из бд
+    console.log("index is true");
     response.send
   }
 }
