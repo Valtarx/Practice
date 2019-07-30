@@ -1,26 +1,24 @@
 //const {workerData} = require('worker_threads');
 
-var needle = require('needle');
 const cheerio = require('cheerio');
+var request = require('request');
 //workerData.source + workerData.word
+
 if(0!=0){
 
 }
 else{
-    needle.get("https://dictionary.cambridge.org/dictionary/english/find",function(error,respone){
-        if(!error){
-            console.log("star");
-            const $ = cheerio.load(respone.body);
-            console.log(respone.body);
-            
-            console.log("star");
-            
-            
-            console.log("end");              
-        }
-        else{
-            throw error;
-            console.log("star");
-        }
-    })
+    request("https://dictionary.cambridge.org/dictionary/english/check", function (err, res, body) {
+        //console.log(body);
+        var definitions = [];
+        var examples = [];
+        const $ = cheerio.load(body);
+        console.log("star");
+        console.log($("div#dataset-cald4.dictionary").text());
+
+
+        console.log("end");    
+    });
+    
+   
 }
