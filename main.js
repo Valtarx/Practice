@@ -3,6 +3,8 @@ const Pool = require('worker-threads-pool');
 var amqp = require('amqplib/callback_api');
 
 const exapp = express();
+
+var isResponseReadyTimer;
 exapp.get("/translations",function(request,response){
   amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
@@ -28,8 +30,10 @@ exapp.get("/translations",function(request,response){
       // connection.close();
       // process.exit(0);
       // }, 500);
+      isResponseReadyTimer = setInterval(isResponseReady,1000,response);
+      response.send("Success!");
 });
-response.send("Success!");
+
 })
 
 exapp.listen(3000,"127.0.0.1",function(){
@@ -71,8 +75,16 @@ function giveTask(){
         });    
     });      
 });
-  
 }
+
+function isResponseReady(response){
+  var gotov = "готов";
+  if(gotov){
+    clearInterval(isResponseReadyTimer);
+    //здесь код ответа из бд
+  }
+}
+
 
 
 var timer = setInterval(giveTask,1000);
