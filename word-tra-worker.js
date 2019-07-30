@@ -1,15 +1,15 @@
 //const {workerData} = require('worker_threads');
-
-var needle = require('needle');
+    
 const cheerio = require('cheerio');
+var request = require('request');
 //workerData.source + workerData.word
 if(0!=0){
 
 }
 else{
-    needle.get("https://wooordhunt.ru/word/green",function(error,respone){
-        if(!error){
-            const $ = cheerio.load(respone.body);
+    request('https://wooordhunt.ru/word/green', function (error, response, body) {
+
+            const $ = cheerio.load(body);
             var translations = [];
             var numOfTra = 0;
             var numOfHidden;
@@ -38,7 +38,7 @@ else{
             console.log("end");
             
     
-        }
+        
     })
 }
 
