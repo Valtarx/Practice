@@ -12,6 +12,9 @@ var totalNumOfResponses = -1;
 var timer1;
 var timer2;
 exapp.get("/translations",function(request,response){
+  var word   = "green";
+  var source = "https://wooordhunt.ru";
+  var queue = 'translation_queue';           
   amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
         throw error0;
@@ -24,10 +27,6 @@ exapp.get("/translations",function(request,response){
         if (error1) {
             throw error1;
         }
-        var queue = 'translation_queue';
-                
-        var source = "https://wooordhunt.ru"; 
-        var word   = "green";
         var msg = indexOfThisResponse.toString()+";"+source+";"+word;
 
         channel.assertQueue(queue, {
@@ -47,7 +46,8 @@ exapp.get("/translations",function(request,response){
       // process.exit(0);
       // }, 500);
       console.log("indexOfthis"+indexOfThisResponse);
-      isResponseReadyTimers[indexOfThisResponse] = setInterval(isResponseReady,1000,response,indexOfThisResponse);
+      isResponseReadyTimers[indexOfThisResponse] = setInterval(isResponseReady,1000,response,
+        indexOfThisResponse,{source:source,word:word,queue:queue});
       response.send("Success!");
 });
 
@@ -55,6 +55,9 @@ exapp.get("/translations",function(request,response){
 
 
 exapp.get("/definitions",function(request,response){
+  var queue = 'definitions_queue';
+  var source = "https://dictionary.cambridge.org"; 
+  var word   = "green";
   amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
         throw error0;
@@ -67,11 +70,7 @@ exapp.get("/definitions",function(request,response){
         if (error1) {
             throw error1;
         }
-        var queue = 'definitions_queue';
-        //поставить другой сайт для дефиниций
-        var source = "https://dictionary.cambridge.org"; 
-        //source = "https://www.lexico.com";
-        var word   = "green";
+        
         var msg = indexOfThisResponse.toString()+";"+source+";"+word;
 
         channel.assertQueue(queue, {
@@ -91,7 +90,8 @@ exapp.get("/definitions",function(request,response){
       // process.exit(0);
       // }, 500);
       console.log("indexOfthis"+indexOfThisResponse);
-      isResponseReadyTimers[indexOfThisResponse] = setInterval(isResponseReady,1000,response,indexOfThisResponse);
+      isResponseReadyTimers[indexOfThisResponse] = setInterval(isResponseReady,1000,response,
+        indexOfThisResponse,{source:source,word:word,queue:queue});
       response.send("Success!");
 });
 })
@@ -138,12 +138,15 @@ function giveTask(typeOfTask){
 });
 }
 
-function isResponseReady(response,indexOfThisResponse){
+function isResponseReady(response,indexOfThisResponse,data){
   console.log("I was Here"+indexOfThisResponse);
   if(isRepsonseReadyFlags[indexOfThisResponse] == true){
     clearInterval(isResponseReadyTimers[indexOfThisResponse]);
     //здесь код ответа из бд
+    
     console.log("index is true");
+    console.log(data.word);
+    console.log(data.source);
     response.send
   }
 }
