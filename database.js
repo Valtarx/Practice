@@ -3,10 +3,17 @@ const Sequelize = require('sequelize')
 const sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: './Words_DB.db',
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    },
     define: {
       timestamps: false
     }
   });
+  var db = {};
   
   // Проверка соединения с бд
   sequelize
@@ -24,44 +31,45 @@ const Translation = sequelize.import(__dirname + "/models/translation");
 const Definition = sequelize.import(__dirname + "/models/definition");
 const Example = sequelize.import(__dirname + "/models/example");
 
-//Синхронизация моделей с бд
-sequelize.sync().then(result=>{
- // console.log(result);
-})
-.catch(err=> console.log(err));
 
 
+var Wo = 'start';
+
+/* Работает
 Word.findOne({
   raw:true, 
   where: { 
-    word: 'start'
+    word: oldword
   }
 }).then(word => {
   console.log(word);
   
 }).catch(err=>console.log(err));
+*/
 
 
-Translation.findAll({raw:true, attributes: ['id', 'translation'],
-where: {
-  word_id: 1
-  }
-}).then(translations=>{
-  console.log(translations);
-}).catch(err=>console.log(err));
 
-Definition.findAll({raw:true, attributes: ['id', 'definition'],
-where: {
-  word_id: 1
-  }
-}).then(definitions=>{
-  console.log(definitions);
-}).catch(err=>console.log(err));
+module.exports.isWordExists = function(W){
+   return Word.count({
+    raw:true, 
+    where: { 
+      word: W
+    }
+  }).then(count => 
+  {
+   var f = count;
+    //console.log(f);
+     return count; 
+  }) 
+};
 
-Example.findAll({raw:true, attributes: ['id', 'example'],
-where: {
-  word_id: 1
-  }
-}).then(examples=>{
-  console.log(examples);
-}).catch(err=>console.log(err));
+
+
+
+
+
+
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
+
+//module.exports = db;

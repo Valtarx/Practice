@@ -3,10 +3,16 @@ const {workerData} = require('worker_threads');
     
 const cheerio = require('cheerio');
 var request = require('request');
-if(0!=0){
+const check = require('./database.js');
 
+console.log(f,"Start!");
+
+check.isWordExists('start').then(f => {
+if(f>0){
+    console.log(f,"Yes!");
 }
 else{
+    console.log(f, "No!");
     var site;
         switch(workerData.source){
             case "https://dictionary.cambridge.org":
@@ -86,4 +92,4 @@ else{
     
 })
 }
-
+})
