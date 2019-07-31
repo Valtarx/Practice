@@ -14,6 +14,7 @@ var timer2;
 exapp.get("/translations",function(request,response){
   var word   = "green";
   var source = "https://wooordhunt.ru";
+  source = "https://dictionary.cambridge.org"; 
   var queue = 'translation_queue';           
   amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
@@ -57,6 +58,7 @@ exapp.get("/translations",function(request,response){
 exapp.get("/definitions",function(request,response){
   var queue = 'definitions_queue';
   var source = "https://dictionary.cambridge.org"; 
+  source = "https://www.lexico.com";
   var word   = "green";
   amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
@@ -147,6 +149,7 @@ function isResponseReady(response,indexOfThisResponse,data){
     console.log("index is true");
     console.log(data.word);
     console.log(data.source);
+    console.log(data.queue);
     response.send
   }
 }
