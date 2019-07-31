@@ -12,7 +12,7 @@ var totalNumOfResponses = -1;
 var timer1;
 var timer2;
 exapp.get("/translations",function(request,response){
-  var word   = "green";
+  var word   = "yellow";
   var source = "https://wooordhunt.ru";
   source = "https://dictionary.cambridge.org"; 
   var queue = 'translation_queue';           
