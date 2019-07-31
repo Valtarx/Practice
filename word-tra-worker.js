@@ -1,13 +1,12 @@
-//const {workerData} = require('worker_threads');
+const {workerData} = require('worker_threads');
     
 const cheerio = require('cheerio');
 var request = require('request');
-//workerData.source + workerData.word
 if(0!=0){
 
 }
 else{
-    request('https://wooordhunt.ru/word/green', function (error, response, body) {
+    request(workerData.source + workerData.word, function (error, response, body) {
 
         const $ = cheerio.load(body);
         var translations = [];
