@@ -46,6 +46,45 @@ exapp.get("/translations",function(request,response){
 
 })
 
+
+exapp.get("/definitions",function(request,response){
+  amqp.connect('amqp://localhost', function(error0, connection) {
+    if (error0) {
+        throw error0;
+    }
+    var indexOfThisResponse;
+    ++totalNumOfResponses;
+    indexOfThisResponse = totalNumOfResponses;
+    isRepsonseReadyFlags[indexOfThisResponse] = false;
+    connection.createChannel(function(error1, channel) {
+        if (error1) {
+            throw error1;
+        }
+        var queue = 'definitions_queue';
+        //поставить другой сайт для дефиниций        
+        var msg = indexOfThisResponse.toString()+";https://wooordhunt.ru/word/;"+"green";
+
+        channel.assertQueue(queue, {
+            durable: true
+        });
+        channel.sendToQueue(queue, Buffer.from(msg), {
+            persistent: true
+        });
+        console.log(" [x] Sent '%s'", msg);
+    });
+      //закрыть соединение с серверов очередей (если надо)
+      // setTimeout(function() {
+      // connection.close();
+      // process.exit(0);
+      // }, 500);
+      console.log("indexOfthis"+indexOfThisResponse);
+      isResponseReadyTimers[indexOfThisResponse] = setInterval(isResponseReady,1000,response,indexOfThisResponse);
+      response.send("Success!");
+});
+})
+
+
+
 exapp.listen(3000,"127.0.0.1",function(){
     console.log("Сервер начал прослушивание")
 })  
@@ -83,7 +122,7 @@ function giveTask(){
             channel.ack(msg);
               {noAck: false }
               indexOfReadyResponse = parseInt(data[0]);
-              isRepsonseReadyFlags[0] = true;
+              isRepsonseReadyFlags[indexOfReadyResponse] = true;
             console.log(`worker ${i} exited (pool size: ${pool.size})`)
             })
           })
