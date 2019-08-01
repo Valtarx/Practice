@@ -2,7 +2,7 @@
 
 module.exports = (sequelize, DataTypes) => {
 
-  const Word = sequelize.define('Word', {
+  const Word = sequelize.define('word', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -63,7 +63,8 @@ Word.associate = function(models) {
       });
   };
 */
-
+  
   return Word;
 
 };
+

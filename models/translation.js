@@ -2,7 +2,7 @@
 
 module.exports = (sequelize, DataTypes) => {
 
-  var Translation = sequelize.define('Translation', {
+  var Translation = sequelize.define('translation', {
 
     id: {
         type: DataTypes.INTEGER,
@@ -35,15 +35,32 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: 'translation'
     });
-
+/*
+    Translation.belongsTo(sequelize.models.Word, {
+     // onDelete: "CASCADE",
+      foreighKey: 'word_id',
+      targetKey: 'id'
+    });
+*/
+    /*
     Translation.associate = function (models) {
       models.Translation.belongsTo(models.Word, {
         onDelete: "CASCADE",
         foreighKey: 'word_id',
         targetKey: 'id'
       });
-  
     };
+    */
+/*
+   Translation.associate = function (models) {
+    models.Translation.belongsTo(models.User, {
+      onDelete: "CASCADE",
+      foreignKey: {
+        allowNull: false
+      }
+    });
+  };
+*/
   return Translation;
 
 };
