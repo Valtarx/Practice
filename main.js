@@ -8,7 +8,7 @@ const exapp = express();
 
 var isResponseReadyTimer;
 var isResponseReadyTimers = [];
-var isRepsonseReadyFlags  = [];
+var isResponseReadyFlags  = [];
 var totalNumOfResponses = -1;
 var timer1;
 var timer2;
@@ -24,7 +24,7 @@ exapp.get("/translations",function(request,response){
     var indexOfThisResponse;
     ++totalNumOfResponses;
     indexOfThisResponse = totalNumOfResponses;
-    isRepsonseReadyFlags[indexOfThisResponse] = false;
+    isResponseReadyFlags[indexOfThisResponse] = false;
     connection.createChannel(function(error1, channel) {
         if (error1) {
             throw error1;
@@ -59,7 +59,8 @@ exapp.get("/translations",function(request,response){
 exapp.get("/definitions",function(request,response){
   var queue = 'definitions_queue';
   var source = "https://dictionary.cambridge.org"; 
-  source = "https://www.lexico.com";
+ // source = "https://www.lexico.com";
+  
   var word   = "green";
   amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
@@ -68,7 +69,7 @@ exapp.get("/definitions",function(request,response){
     var indexOfThisResponse;
     ++totalNumOfResponses;
     indexOfThisResponse = totalNumOfResponses;
-    isRepsonseReadyFlags[indexOfThisResponse] = false;
+    isResponseReadyFlags[indexOfThisResponse] = false;
     connection.createChannel(function(error1, channel) {
         if (error1) {
             throw error1;
@@ -139,11 +140,15 @@ function giveTask(typeOfTask){
           //pool.acquire('./ndl.js', function (err, worker) {
           if (err) throw err
           console.log(`started worker ${i} (pool size: ${pool.size})`)
-          worker.on('exit', function () {
+          worker.on('message',response =>{
+            
             channel.ack(msg);
-              {noAck: false }
-              indexOfReadyResponse = parseInt(data[0]);
-              isRepsonseReadyFlags[indexOfReadyResponse] = true;
+            {noAck: false }
+            indexOfReadyResponse = parseInt(data[0]);
+            isResponseReadyFlags[indexOfReadyResponse] = response;
+          })
+          worker.on('exit', function () {
+            
             console.log(`worker ${i} exited (pool size: ${pool.size})`)
             })
           })
@@ -153,11 +158,30 @@ function giveTask(typeOfTask){
 }
 
 function isResponseReady(response,indexOfThisResponse,data){
-  console.log("I was Here"+indexOfThisResponse);
-  if(isRepsonseReadyFlags[indexOfThisResponse] == true){
+  if(isResponseReadyFlags[indexOfThisResponse] != false){
     clearInterval(isResponseReadyTimers[indexOfThisResponse]);
     //здесь код ответа из бд
     
+    if(data.queue == "translation_queue"){
+      console.log("translation_queue, oke");
+      for(var i = 0; i<isResponseReadyFlags[indexOfThisResponse].trans.length;++i){
+        console.log(i+isResponseReadyFlags[indexOfThisResponse].trans[i]);
+     }
+    }
+    else if(data.queue == "definitions_queue"){
+      // console.log(isResponseReadyFlags[indexOfThisResponse].def);
+      //     console.log(isResponseReadyFlags[indexOfThisResponse].examp);
+      //     console.log(isResponseReadyFlags[indexOfThisResponse].numOfCells);
+      for(var i =0;i<isResponseReadyFlags[indexOfThisResponse].def.length;++i){
+        console.log(isResponseReadyFlags[indexOfThisResponse].def[i]);
+      }
+      console.log("Examples");
+      for(var i=0;i<isResponseReadyFlags[indexOfThisResponse].def.length*
+        isResponseReadyFlags[indexOfThisResponse].numOfCells;++i){
+        if(isResponseReadyFlags[indexOfThisResponse].examp[i]!=undefined)
+        console.log(isResponseReadyFlags[indexOfThisResponse].examp[i]);
+      }
+    }
     console.log("index is true");
     console.log(data.word);
     console.log(data.source);

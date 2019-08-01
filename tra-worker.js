@@ -1,18 +1,9 @@
-const {workerData} = require('worker_threads');
+const {workerData, parentPort} = require('worker_threads');
 //workerData.source + workerData.word
     
 const cheerio = require('cheerio');
 var request = require('request');
-const check = require('./database.js');
 
-console.log(f,"Start!");
-
-check.isWordExists('start').then(f => {
-if(f>0){
-    console.log(f,"Yes!");
-}
-else{
-    console.log(f, "No!");
     var site;
         switch(workerData.source){
             case "https://dictionary.cambridge.org":
@@ -82,14 +73,12 @@ else{
         }
         
 
-        for(var i = 0; i<translations.length;++i){
-            console.log(i+translations[i]);
-        }
         
+
+        parentPort.postMessage({trans:translations});
         console.log("end");
         
 
-    
 })
-}
-})
+
+

@@ -1,11 +1,7 @@
-const {workerData} = require('worker_threads');
+const {workerData, parentPort} = require('worker_threads');
 const cheerio = require('cheerio');
 var request = require('request');
-
-if(0!=0){
-
-}
-else{
+//workerData = {source:"https://dictionary.cambridge.org",word:"green"};
     var site;
     switch(workerData.source){
         case "https://dictionary.cambridge.org":
@@ -18,9 +14,8 @@ else{
             break;
     }
     request(site, function (err, res, body) {
-        
+        console.log("start");
         const $ = cheerio.load(body);
-        console.log("star");
         var definitions = [];
         var examples = [];
         var numOfDef =0;
@@ -32,9 +27,9 @@ else{
         var example;
         var min;
         var j;
+        console.log(workerData.source);
         switch(workerData.source){
             case "https://dictionary.cambridge.org":
-                          
                     var ukDef = $("div#dataset-cald4.dictionary");
                     for(var i =0; i<ukDef.find("div.entry-body").children().length;++i){
                         partOfSpeech = ukDef.find("div.entry-body").children().eq(i);
@@ -105,14 +100,14 @@ else{
         
 
 
-        for(var i =0;i<definitions.length;++i){
-            console.log(definitions[i]);
-        }
-        console.log("Examples");
-        for(var i=0;i<numOfDef*minNumOfExamples;++i){
-            if(examples[i]!=undefined)
-            console.log(examples[i]);
-        }
+        // for(var i =0;i<definitions.length;++i){
+        //     console.log(definitions[i]);
+        // }
+        // console.log("Examples");
+        // for(var i=0;i<numOfDef*minNumOfExamples;++i){
+        //     if(examples[i]!=undefined)
+        //     console.log(examples[i]);
+        // }
         //в массиве definitions лежат все дефиниции
 
         //в массиве examples лежат примеры употребления слова с данной дефиницией
@@ -128,9 +123,10 @@ else{
 
         //workerData.word - здесь хранится слов
         //workerData.source - сайт
-
+        parentPort.postMessage({def:definitions,examp:examples,numOfCells:minNumOfExamples});
         console.log("end");    
     });
 
-   console.log("end2");
-}
+
+
+
