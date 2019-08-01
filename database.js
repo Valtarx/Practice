@@ -63,7 +63,25 @@ module.exports.isWordExists = function(W){
   }) 
 };
 
-
+module.exports.AddWord = function(W) {
+  /* Работает!
+  return Word.create({ word: W }).then(word => {
+    console.log("Auto-generated ID:", word.id);
+    return word.id;
+  });
+  */
+  console.log(W);
+  return Word.findOne({
+    raw:true, 
+    where: { 
+      word: W
+    }
+  }).then(word => {
+    console.log(word);
+    return word;    
+  }).catch(err=>console.log(err));
+  
+};
 
 
 

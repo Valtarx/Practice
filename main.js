@@ -3,7 +3,7 @@ const fs = require('fs');
 const Pool = require('worker-threads-pool');
 const pool = new Pool({max: 6})
 var amqp = require('amqplib/callback_api');
-const check = require('./database.js');
+const database = require('./database.js');
 
 const exapp = express();
 
@@ -19,7 +19,7 @@ exapp.get("/translations",function(request,response){
   source = "https://dictionary.cambridge.org"; 
   var queue = 'translation_queue';
 
-  check.isWordExists(word).then(f => {
+  database.isWordExists(word).then(f => {
     if(f > 0){    
         console.log(f,"Yes!");
     }
@@ -181,6 +181,9 @@ function isResponseReady(response,indexOfThisResponse,data){
       for(var i = 0; i<trans.length;++i){
         console.log(i+trans[i]);
      }
+     database.AddWord(data.word).then(id => 
+      console.log(id)
+    )
     }
     else if(data.queue == "definitions_queue"){
       // console.log(isResponseReadyFlags[indexOfThisResponse].def);
