@@ -16,7 +16,8 @@ exapp.get("/translations",function(request,response){
   var word   = "lay";
   var source = "https://wooordhunt.ru";
   source = "https://dictionary.cambridge.org"; 
-  var queue = 'translation_queue';           
+  var queue = 'translation_queue';
+     
   amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
         throw error0;
@@ -158,35 +159,38 @@ function giveTask(typeOfTask){
 }
 
 function isResponseReady(response,indexOfThisResponse,data){
+
   if(isResponseReadyFlags[indexOfThisResponse] != false){
     clearInterval(isResponseReadyTimers[indexOfThisResponse]);
     //здесь код ответа из бд
     
     if(data.queue == "translation_queue"){
       console.log("translation_queue, oke");
-      for(var i = 0; i<isResponseReadyFlags[indexOfThisResponse].trans.length;++i){
-        console.log(i+isResponseReadyFlags[indexOfThisResponse].trans[i]);
+      var trans = isResponseReadyFlags[indexOfThisResponse].trans;
+      for(var i = 0; i<trans.length;++i){
+        console.log(i+trans[i]);
      }
     }
     else if(data.queue == "definitions_queue"){
       // console.log(isResponseReadyFlags[indexOfThisResponse].def);
       //     console.log(isResponseReadyFlags[indexOfThisResponse].examp);
       //     console.log(isResponseReadyFlags[indexOfThisResponse].numOfCells);
-      for(var i =0;i<isResponseReadyFlags[indexOfThisResponse].def.length;++i){
-        console.log(isResponseReadyFlags[indexOfThisResponse].def[i]);
+      var def        = isResponseReadyFlags[indexOfThisResponse].def;
+      var examp      = isResponseReadyFlags[indexOfThisResponse].examp;
+      var numOfCells = isResponseReadyFlags[indexOfThisResponse].numOfCells
+      for(var i =0;i<def.length;++i){
+        console.log(def[i]);
       }
-      console.log("Examples");
-      for(var i=0;i<isResponseReadyFlags[indexOfThisResponse].def.length*
-        isResponseReadyFlags[indexOfThisResponse].numOfCells;++i){
-        if(isResponseReadyFlags[indexOfThisResponse].examp[i]!=undefined)
-        console.log(isResponseReadyFlags[indexOfThisResponse].examp[i]);
+      console.log("Examples");  
+      for(var i=0;i<def.length*numOfCells;++i){
+        if(examp[i]!=undefined)
+        console.log(examp[i]);
       }
     }
-    console.log("index is true");
-    console.log(data.word);
-    console.log(data.source);
-    console.log(data.queue);
-    response.send
+    // console.log("index is true");
+    // console.log(data.word);
+    // console.log(data.source);
+    // console.log(data.queue);
   }
 }
 
