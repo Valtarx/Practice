@@ -14,9 +14,10 @@ var totalNumOfResponses = -1;
 var timer1;
 var timer2;
 exapp.get("/translations",function(request,response){
-  var word   = "lay";
-  var source = "https://wooordhunt.ru";
-  source = "https://dictionary.cambridge.org"; 
+  const {source,word} = request.query;
+  // var word   = "lay";
+  // var source = "https://wooordhunt.ru";
+  // source = "https://dictionary.cambridge.org"; 
   var queue = 'translation_queue';
 
   database.isWordExists(word).then(f => {
@@ -69,11 +70,12 @@ exapp.get("/translations",function(request,response){
 
 
 exapp.get("/definitions",function(request,response){
+  const {source,word} = request.query;
   var queue = 'definitions_queue';
-  var source = "https://dictionary.cambridge.org"; 
+  //var source = "https://dictionary.cambridge.org"; 
  // source = "https://www.lexico.com";
   
-  var word   = "green";
+  //var word   = "green";
   amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
         throw error0;
