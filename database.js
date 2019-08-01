@@ -1,93 +1,73 @@
-
-const Sequelize = require('sequelize')
-const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: './Words_DB.db',
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
-    },
-    define: {
-      timestamps: false
-    }
-  });
-  var db = {};
-  
-  // Проверка соединения с бд
-  sequelize
-  .authenticate()
-  .then(() => {
-    console.log('Connection has been established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
-
-const Word = sequelize.import(__dirname + "/models/word");
-
-const Translation = sequelize.import(__dirname + "/models/translation");
-const Definition = sequelize.import(__dirname + "/models/definition");
-const Example = sequelize.import(__dirname + "/models/example");
-
-
-
-var Wo = 'start';
-
-/* Работает
-Word.findOne({
-  raw:true, 
-  where: { 
-    word: oldword
-  }
-}).then(word => {
-  console.log(word);
-  
-}).catch(err=>console.log(err));
-*/
-
+const db = require('./configure.js');
+const Word = db.word;
+const Translation = db.translation;
 
 
 module.exports.isWordExists = function(W){
-   return Word.count({
-    raw:true, 
-    where: { 
-      word: W
-    }
-  }).then(count => 
-  {
-   var f = count;
-    //console.log(f);
-     return count; 
-  }) 
+  return Word.count({
+   raw:true, 
+   where: { 
+     word: W
+   }
+ }).then(count => 
+ {
+  var f = count;
+   //console.log(f);
+    return count; 
+ }) 
 };
 
-module.exports.AddWord = function(W) {
-  /* Работает!
-  return Word.create({ word: W }).then(word => {
-    console.log("Auto-generated ID:", word.id);
-    return word.id;
+
+
+module.exports.FindTran = function(W){
+return Word.findAll({
+  raw:true,
+  where: { 
+    word: W
+  },
+  attributes: [ /*'id', 'word'*/],
+  include: [{
+    model: Translation,
+    where: { word_id: db.Sequelize.col('word.id') },
+    attributes: ['translation']
+  }]
+}).then(words => {
+   //res.send(words);
+   
+   //var d = words[1]['translations.translation'];
+   
+   //return d;
+   //console.log(d);
+   return words;
+});
+}
+
+
+/*
+module.exports.findTranslations = function(req, res){
+  Word.findAll({
+    attributes: [ 'id', 'word'],
+    include: [{
+      model: Translation,
+      where: { word_id: db.Sequelize.col('company.id') },
+      attributes: ['id', 'translation', 'word_id']
+    }]
+  }).then(words => {
+     res.send(words);
+     console.log(res);
   });
+}*/
+/*  
+exports.findAll = (req, res) => {
+    Word.findAll({
+      attributes: [ 'id', 'word'],
+      include: [{
+        model: Translation,
+        where: { word_id: db.Sequelize.col('company.id') },
+        attributes: ['id', 'translation', 'word_id']
+      }]
+    }).then(words => {
+       res.send(words);
+    });
+  };
   */
-  console.log(W);
-  return Word.findOne({
-    raw:true, 
-    where: { 
-      word: W
-    }
-  }).then(word => {
-    console.log(word);
-    return word;    
-  }).catch(err=>console.log(err));
-  
-};
-
-
-
-
-
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
-//module.exports = db;

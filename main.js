@@ -3,7 +3,7 @@ const fs = require('fs');
 const Pool = require('worker-threads-pool');
 const pool = new Pool({max: 6})
 var amqp = require('amqplib/callback_api');
-const database = require('./database.js');
+const trandata = require('./database.js');
 
 const exapp = express();
 
@@ -19,13 +19,26 @@ exapp.get("/translations",function(request,response){
   // var source = "https://wooordhunt.ru";
   // source = "https://dictionary.cambridge.org"; 
   var queue = 'translation_queue';
+  var v = "start";
 
-  database.isWordExists(word).then(f => {
-    if(f > 0){    
-        console.log(f,"Yes!");
+  trandata.FindTran(v).then(data => {
+    //console.log(data);
+    
+    var trans = [];
+    for (j = 0; j<data.length; j++) {
+      trans[j] = data[j]['translations.translation'];
+    }
+    var check = trans[0];
+
+    if(check != undefined){    
+        console.log("Yes! Word already exists");
+        for (j = 0; j<data.length; j++) 
+          console.log(trans[j]);
+        
+        //тут доступен массив trans
     }
     else{
-        console.log(f, "No!");
+        console.log("No! Word doesn't exist.");
         amqp.connect('amqp://localhost', function(error0, connection) {
     if (error0) {
         throw error0;
