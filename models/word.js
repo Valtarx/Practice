@@ -2,8 +2,7 @@
 
 module.exports = (sequelize, DataTypes) => {
 
-  var Word = sequelize.define('Word', {
-    // attributes
+  const Word = sequelize.define('Word', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -20,14 +19,31 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'word',
     getterMethods: {
-        wordid() {
-      return this.getDataValue('id');
+      wordid() {
+        return this.getDataValue('id');
+      }
+    },
+    setterMethods: {
+      newWord(val) {
+        this.setDataValue('word', newWord.toString())
+      }
     }
-  },
 });
 
+/*
+Word.associate = function(models) {
+  models.Word.hasMany(models.Translation);
+
+};
+*/
+/*
+  Word.hasMany(sequelize.models.Translation, {
+  foreighKey: 'word_id',
+  sourceKey: 'id'
+});
+/*
   Word.associate = function(models) {
-    models.Word.hasMany(models.Translation, {
+    models.Word.hasMany(sequelize.models.Translation, {
         foreighKey: 'word_id',
         sourceKey: 'id'
       });
@@ -46,7 +62,7 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: 'id'
       });
   };
-
+*/
 
   return Word;
 
