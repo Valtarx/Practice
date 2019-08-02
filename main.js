@@ -125,18 +125,6 @@ exapp.get("/definitions",function(request,response){
 });
 })
 
-exapp.get("/flash-cards-maker",function(request,response){
-    fs.readFile("./mainPage.html", function(error, data){          
-        if(error){
-                  
-            response.statusCode = 404;
-            response.end("Resourse not found!");
-        }   
-        else{
-            response.end(data);
-        }
-    });
-});
 
 exapp.listen(4000,"127.0.0.1",function(){
     console.log("Сервер начал прослушивание")
