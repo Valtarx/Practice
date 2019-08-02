@@ -19,8 +19,8 @@ exapp.get("/translations",function(request,response){
   // var source = "https://wooordhunt.ru";
   // source = "https://dictionary.cambridge.org"; 
   var queue = 'translation_queue';
-  var v = "start";
-
+  var v = word;
+  
   trandata.FindTran(v).then(data => {
     //console.log(data);
     
@@ -72,7 +72,6 @@ exapp.get("/translations",function(request,response){
       console.log("indexOfthis"+indexOfThisResponse);
       isResponseReadyTimers[indexOfThisResponse] = setInterval(isResponseReady,1000,response,
         indexOfThisResponse,{source:source,word:word,queue:queue});
-      response.send("Success!");
 });
 
     };
@@ -123,7 +122,6 @@ exapp.get("/definitions",function(request,response){
       console.log("indexOfthis"+indexOfThisResponse);
       isResponseReadyTimers[indexOfThisResponse] = setInterval(isResponseReady,1000,response,
         indexOfThisResponse,{source:source,word:word,queue:queue});
-      response.send("Success!");
 });
 })
 
@@ -188,7 +186,7 @@ function isResponseReady(response,indexOfThisResponse,data){
 
   if(isResponseReadyFlags[indexOfThisResponse] != false){
     clearInterval(isResponseReadyTimers[indexOfThisResponse]);
-    //здесь код ответа из бд
+
     
     if(data.queue == "translation_queue"){
       console.log("translation_queue, oke");
@@ -196,9 +194,14 @@ function isResponseReady(response,indexOfThisResponse,data){
       for(var i = 0; i<trans.length;++i){
         console.log(i+trans[i]);
      }
-     database.AddWord(data.word).then(id => 
-      console.log(id)
-    )
+     response.setHeader('Access-Control-Allow-Origin', '*');
+     response.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
+     response.send({data:trans});
+     response.end();
+
+     //database.AddWord(data.word).then(id => 
+     // console.log(id)
+   // )
     }
     else if(data.queue == "definitions_queue"){
       // console.log(isResponseReadyFlags[indexOfThisResponse].def);
@@ -215,6 +218,24 @@ function isResponseReady(response,indexOfThisResponse,data){
         if(examp[i]!=undefined)
         console.log(examp[i]);
       }
+      response.setHeader('Access-Control-Allow-Origin', '*');
+      response.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
+      dat = [];
+      var k1;
+      var arr =[];
+      for(var i=0;i<def.length;++i){
+        k=0;
+        arr = [];
+        for(var j=0;j<numOfCells;++j){
+          if(examp[i*numOfCells+j]!=undefined){
+            arr[k]=examp[i*numOfCells+j];
+            ++k;
+          }
+        }
+        dat[i] = {definition:def[i],examples:arr};
+      }
+      response.send({data:dat});
+      response.end();
     }
     // console.log("index is true");
     // console.log(data.word);
